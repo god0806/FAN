@@ -128,15 +128,15 @@
                     <div class="text-2xl mb-2">⚠️ 陷阱一：小數位數</div>
                     <h3 class="font-bold text-amber-300 text-base">小數平方，位數翻倍！</h3>
                     <p class="text-xs text-slate-300 mt-2 leading-relaxed">
-                        $(0.3)^2 = 0.3 \times 0.3 = 0.09$。<br>
-                        所以 $\pm 0.3$ 是 <strong class="text-white underline">0.09</strong> 的平方根，絕對不是 $0.9$ 的平方根！
+                        (0.3)<sup>2</sup> = 0.3 &times; 0.3 = 0.09。<br>
+                        所以 &plusmn;0.3 是 <strong class="text-white underline">0.09</strong> 的平方根，絕對不是 0.9 的平方根！
                     </p>
                 </div>
                 <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl hover:border-sky-400/50 transition">
                     <div class="text-2xl mb-2">🔍 陷阱二：中文 vs 符號</div>
                     <h3 class="font-bold text-sky-300 text-base">根號前沒負號，必為正！</h3>
                     <p class="text-xs text-slate-300 mt-2 leading-relaxed">
-                        問「$81$ 的平方根」有兩個：$\pm 9$。<br>
+                        問「81 的平方根」有兩個：&plusmn;9。<br>
                         問「<span class="math-sqrt"><span class="math-sqrt-sym">&radic;</span><span class="math-sqrt-num">81</span></span>」代表正平方根，答案只有 <strong class="text-white underline">+9</strong>！
                     </p>
                 </div>
@@ -144,14 +144,14 @@
                     <div class="text-2xl mb-2">🚫 陷阱三：負數與括號</div>
                     <h3 class="font-bold text-rose-300 text-base">負數沒有平方根！</h3>
                     <p class="text-xs text-slate-300 mt-2 leading-relaxed">
-                        任何數平方必 $\ge 0$。且注意 $-5^2 = -25$ 與 $(-5)^2 = 25$ 不同，負數找不到平方根！
+                        任何數平方必 &ge; 0。且注意 &minus;5<sup>2</sup> = &minus;25 與 (&minus;5)<sup>2</sup> = 25 不同，負數找不到平方根！
                     </p>
                 </div>
                 <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl hover:border-emerald-400/50 transition">
                     <div class="text-2xl mb-2">👑 關鍵特例：0 與無理數</div>
                     <h3 class="font-bold text-emerald-300 text-base">0 只有一個，開不出就戴帽</h3>
                     <p class="text-xs text-slate-300 mt-2 leading-relaxed">
-                        $0$ 的平方根只有 $0$。若遇到 $6$ 找不到整數平方，直接戴帽子加正負：$\pm$<span class="math-sqrt"><span class="math-sqrt-sym">&radic;</span><span class="math-sqrt-num">6</span></span>。
+                        0 的平方根只有 0。若遇到 6 找不到整數平方，直接戴帽子加正負：&plusmn;<span class="math-sqrt"><span class="math-sqrt-sym">&radic;</span><span class="math-sqrt-num">6</span></span>。
                     </p>
                 </div>
             </div>
@@ -408,11 +408,11 @@
                     <div class="space-y-3 text-sm sm:text-base">
                         <div class="p-3 rounded-xl bg-slate-800 flex items-center justify-between">
                             <span>正數材料：<strong class="text-emerald-400">9</strong></span>
-                            <span>➔ $9 \\times 9 =$ <strong class="text-white">81</strong></span>
+                            <span>➔ 9<sup>2</sup> = 9 &times; 9 = <strong class="text-white">81</strong></span>
                         </div>
                         <div class="p-3 rounded-xl bg-slate-800 flex items-center justify-between">
-                            <span>負數材料：<strong class="text-emerald-400">-9</strong></span>
-                            <span>➔ $(-9) \\times (-9) =$ <strong class="text-white">81</strong></span>
+                            <span>負數材料：<strong class="text-emerald-400">&minus;9</strong></span>
+                            <span>➔ (&minus;9)<sup>2</sup> = (&minus;9) &times; (&minus;9) = <strong class="text-white">81</strong></span>
                         </div>
                         <p class="text-amber-300 font-bold pt-2">💡 結論：正著走有兩個數都能做出 81，所以倒著走問「81 的平方根」時，一定要回答正負兩個（&plusmn;9）！</p>
                     </div>
@@ -428,8 +428,8 @@
                             <span class="text-xl font-black text-sky-300">9 <span class="text-xs text-rose-400 ml-1">(寫 &plusmn;9 必錯!)</span></span>
                         </div>
                         <div class="p-3 rounded-xl bg-slate-800 flex items-center justify-between">
-                            <span>🔢 符號問：「<strong>-${sqrtHTML('81')}</strong>」（負平方根）</span>
-                            <span class="text-xl font-black text-amber-300">-9</span>
+                            <span>🔢 符號問：「<strong>&minus;${sqrtHTML('81')}</strong>」（負平方根）</span>
+                            <span class="text-xl font-black text-amber-300">&minus;9</span>
                         </div>
                     </div>
                 `
@@ -442,11 +442,11 @@
                     <div class="space-y-3 text-sm sm:text-base">
                         <div class="p-3.5 rounded-xl bg-rose-950/60 border border-rose-500/40">
                             <div class="font-bold text-rose-300">❌ 常見直覺錯誤：</div>
-                            <p class="text-slate-200 mt-1">看到 $3^2 = 9$，就以為 $0.3^2 = 0.9$。</p>
+                            <p class="text-slate-200 mt-1">看到 3<sup>2</sup> = 9，就以為 0.3<sup>2</sup> = 0.9。</p>
                         </div>
                         <div class="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40">
                             <div class="font-bold text-emerald-300">⭕ 正確乘法計算：</div>
-                            <p class="text-white mt-1 text-lg font-black">$(\\pm 0.3)^2 = 0.3 \\times 0.3 = 0.09$（兩位小數！）</p>
+                            <p class="text-white mt-1 text-lg font-black">(&plusmn;0.3)<sup>2</sup> = 0.3 &times; 0.3 = 0.09（兩位小數！）</p>
                         </div>
                         <p class="text-amber-300 font-bold">💡 口訣：一位小數平方變兩位！奇數位小數（如 0.9）開根號絕對不會是乾淨的小數！</p>
                     </div>
@@ -471,10 +471,10 @@
                 factoryContent: `
                     <div class="space-y-3 text-sm sm:text-base">
                         <div class="p-3 rounded-xl bg-slate-800">
-                            <p>$2^2 = 4$（太小了）</p>
-                            <p>$3^2 = 9$（太大了）</p>
+                            <p>2<sup>2</sup> = 4（太小了）</p>
+                            <p>3<sup>2</sup> = 9（太大了）</p>
                         </div>
-                        <p class="text-slate-200">在 $2$ 和 $3$ 之間有一個無限不循環小數（約 $2.449...$），數學家直接發明根號帽子給它戴上，記作 <strong class="text-emerald-400">${sqrtHTML('6')}</strong>！</p>
+                        <p class="text-slate-200">在 2 和 3 之間有一個無限不循環小數（約 2.449...），數學家直接發明根號帽子給它戴上，記作 <strong class="text-emerald-400">${sqrtHTML('6')}</strong>！</p>
                     </div>
                 `,
                 translatorContent: `
@@ -484,7 +484,7 @@
                             <span class="text-xl font-black text-emerald-400">&plusmn;${sqrtHTML('6')}</span>
                         </div>
                         <div class="p-3 rounded-xl bg-slate-800 flex items-center justify-between">
-                            <span>🔢 符號驗算：$( \\pm ${sqrtHTML('6')} )^2 =$</span>
+                            <span>🔢 符號驗算：( &plusmn;${sqrtHTML('6')} )<sup>2</sup> =</span>
                             <span class="text-xl font-black text-white">6</span>
                         </div>
                     </div>
@@ -497,8 +497,8 @@
                 factoryContent: `
                     <div class="space-y-3 text-sm sm:text-base">
                         <div class="p-3 rounded-xl bg-slate-800">
-                            <p>只有 $0 \\times 0 = 0$。</p>
-                            <p class="mt-1 text-slate-300">因為 $+0$ 和 $-0$ 都是同一個數字 $0$（$0$ 是中性數），所以不需要寫 $\\pm 0$。</p>
+                            <p>只有 0<sup>2</sup> = 0 &times; 0 = 0。</p>
+                            <p class="mt-1 text-slate-300">因為 +0 和 &minus;0 都是同一個數字 0（0 是中性數），所以不需要寫 &plusmn;0。</p>
                         </div>
                     </div>
                 `,
@@ -522,24 +522,24 @@
                 factoryContent: `
                     <div class="space-y-3 text-sm sm:text-base">
                         <div class="p-3 rounded-xl bg-slate-800 flex items-center justify-between">
-                            <span>有括號：<strong class="text-emerald-400">$(-5)^2$</strong></span>
-                            <span>$= (-5) \\times (-5) =$ <strong class="text-emerald-400">+25</strong></span>
+                            <span>有括號：<strong class="text-emerald-400">(&minus;5)<sup>2</sup></strong></span>
+                            <span>= (&minus;5) &times; (&minus;5) = <strong class="text-emerald-400">+25</strong></span>
                         </div>
                         <div class="p-3 rounded-xl bg-rose-950/70 border border-rose-500/40 flex items-center justify-between">
-                            <span>沒括號：<strong class="text-rose-400">$-5^2$</strong></span>
-                            <span>$= -(5 \\times 5) =$ <strong class="text-rose-400">-25</strong></span>
+                            <span>沒括號：<strong class="text-rose-400">&minus;5<sup>2</sup></strong></span>
+                            <span>= &minus;(5 &times; 5) = <strong class="text-rose-400">&minus;25</strong></span>
                         </div>
-                        <p class="text-amber-300 font-bold">💡 任何數「自己乘以自己」正正得正、負負也得正，永遠不可能生出 -25！</p>
+                        <p class="text-amber-300 font-bold">💡 任何數「自己乘以自己」正正得正、負負也得正，永遠不可能生出 &minus;25！</p>
                     </div>
                 `,
                 translatorContent: `
                     <div class="space-y-3 text-sm sm:text-base">
                         <div class="p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 flex items-center justify-between">
-                            <span>🗣️ 「<strong>-25 的平方根</strong>」是？</span>
+                            <span>🗣️ 「<strong>&minus;25 的平方根</strong>」是？</span>
                             <span class="text-lg font-black text-rose-400">🚫 無解（負數沒有平方根）</span>
                         </div>
                         <div class="p-3 rounded-xl bg-slate-800 flex items-center justify-between">
-                            <span>🗣️ 「<strong>-5 是誰的平方根？</strong>」</span>
+                            <span>🗣️ 「<strong>&minus;5 是誰的平方根？</strong>」</span>
                             <span class="text-lg font-black text-emerald-400">是 +25 的負平方根</span>
                         </div>
                     </div>
@@ -571,7 +571,7 @@
                 label: '甲',
                 html: `&plusmn;0.3 是 0.9 的平方根。`,
                 isCorrect: false,
-                reason: `因為 $(\\pm 0.3)^2 = 0.09 \\neq 0.9$！小數平方後，小數點位數會變成兩倍。`,
+                reason: `因為 (&plusmn;0.3)<sup>2</sup> = 0.09 &ne; 0.9！小數平方後，小數點位數會變成兩倍。`,
                 fixWay: `🔧 <strong>改錯變對法：</strong>改成「&plusmn;0.3 是 <span class="text-amber-300 underline">0.09</span> 的平方根」或「<span class="text-amber-300 underline">&plusmn;${sqrtHTML('0.9')}</span> 是 0.9 的平方根」。`
             },
             {
@@ -579,23 +579,23 @@
                 label: '乙',
                 html: `&plusmn;${sqrtHTML('6')} 是 6 的平方根。`,
                 isCorrect: true,
-                reason: `完全正確！因為 $(\\pm${sqrtHTML('6')})^2 = 6$，正數 $6$ 的平方根就是一正一負的 $\\pm${sqrtHTML('6')}$。`,
-                fixWay: `✨ <strong>觀念鞏固：</strong>遇到無法開出整數的正數 $a$，其平方根直接寫成 $\\pm${sqrtHTML('a')}$。`
+                reason: `完全正確！因為 (&plusmn;${sqrtHTML('6')})<sup>2</sup> = 6，正數 6 的平方根就是一正一負的 &plusmn;${sqrtHTML('6')}。`,
+                fixWay: `✨ <strong>觀念鞏固：</strong>遇到無法開出整數的正數 <i>a</i>，其平方根直接寫成 &plusmn;${sqrtHTML('<i>a</i>')}。`
             },
             {
                 id: 'bing',
                 label: '丙',
                 html: `0 的平方根為 0。`,
                 isCorrect: true,
-                reason: `完全正確！只有 $0^2 = 0$，且 $+0 = -0 = 0$，所以 $0$ 的平方根只有一個，就是 $0$ 本身。`,
-                fixWay: `✨ <strong>觀念鞏固：</strong>正數有 2 個平方根、$0$ 有 1 個平方根、負數有 0 個平方根。`
+                reason: `完全正確！只有 0<sup>2</sup> = 0，且 +0 = &minus;0 = 0，所以 0 的平方根只有一個，就是 0 本身。`,
+                fixWay: `✨ <strong>觀念鞏固：</strong>正數有 2 個平方根、0 有 1 個平方根、負數有 0 個平方根。`
             },
             {
                 id: 'ding',
                 label: '丁',
                 html: `${sqrtHTML('81')} = &plusmn;9。`,
                 isCorrect: false,
-                reason: `大陷阱！符號「${sqrtHTML('81')}」前面沒有正負號，代表只取 $81$ 的「正平方根」，結果必為正數！`,
+                reason: `大陷阱！符號「${sqrtHTML('81')}」前面沒有正負號，代表只取 81 的「正平方根」，結果必為正數！`,
                 fixWay: `🔧 <strong>改錯變對法：</strong>改成「${sqrtHTML('81')} = <span class="text-amber-300 underline">9</span>」或「<span class="text-amber-300 underline">&plusmn;${sqrtHTML('81')}</span> = &plusmn;9」。`
             },
             {
@@ -603,7 +603,7 @@
                 label: '戊',
                 html: `因為 &minus;5<sup>2</sup> = &minus;25 <span class="text-xs text-slate-400">(原卷印 &minus;2<sup>5</sup> 為筆誤)</span>，所以 &minus;5 是 &minus;25 的平方根。`,
                 isCorrect: false,
-                reason: `雙重陷阱！第一：$(-5)$ 的平方要加括號，$(-5)^2 = +25$；第二：負數（$-25$）根本沒有平方根！`,
+                reason: `雙重陷阱！第一：(&minus;5) 的平方要加括號，(&minus;5)<sup>2</sup> = +25；第二：負數（&minus;25）根本沒有平方根！`,
                 fixWay: `🔧 <strong>改錯變對法：</strong>改成「因為 <span class="text-amber-300 underline">(&minus;5)<sup>2</sup> = 25</span>，所以 &minus;5 是 <span class="text-amber-300 underline">25</span> 的平方根」。`
             }
         ];
@@ -700,18 +700,18 @@
         }
 
         const questionBank = [
-            { q: `&plusmn;0.3 是 0.9 的平方根。`, ans: false, exp: `$( \\pm 0.3 )^2 = 0.09$，所以 $\\pm 0.3$ 是 $0.09$ 的平方根才對！` },
-            { q: `&minus;0.2 是 0.04 的平方根。`, ans: true, exp: `因為 $(-0.2)^2 = 0.04$，只要平方等於 $0.04$ 就是它的平方根之一！` },
-            { q: `${sqrtHTML('81')} = &plusmn;9`, ans: false, exp: `${sqrtHTML('81')} 前面沒有正負號，代表正平方根，只等於 $+9$！` },
-            { q: `81 的平方根為 &plusmn;9`, ans: true, exp: `中文問「81 的平方根」，有正有負，答案為 $\\pm 9$！` },
-            { q: `0 的平方根為 0`, ans: true, exp: `$0$ 的平方根只有一個，就是 $0$ 本身。` },
-            { q: `&plusmn;${sqrtHTML('6')} 是 6 的平方根`, ans: true, exp: `正數 $6$ 的平方根有兩個，記為 $\\pm${sqrtHTML('6')}$。` },
-            { q: `&minus;5 是 &minus;25 的平方根`, ans: false, exp: `負數沒有平方根！且 $(-5)^2 = +25$，所以 $-5$ 是 $+25$ 的平方根。` },
-            { q: `${sqrtHTML('(&minus;7)<sup>2</sup>')} = &minus;7`, ans: false, exp: `根號結果必 $\\ge 0$！${sqrtHTML('(&minus;7)<sup>2</sup>')} $= ${sqrtHTML('49')} = +7$！` },
-            { q: `16 的平方根是 4`, ans: false, exp: `問「16 的平方根」要把兩個都寫出來，是 $\\pm 4$（只寫 4 漏掉負平方根了）！` },
-            { q: `${sqrtHTML('16')} 的平方根是 &plusmn;2`, ans: true, exp: `雙重陷阱題！先把 ${sqrtHTML('16')} 化簡成 $4$，題目就變成「$4$ 的平方根」，答案是 $\\pm 2$！` },
-            { q: `&minus;${sqrtHTML('36')} = &minus;6`, ans: true, exp: `負號在根號外面，代表 $36$ 的負平方根，等於 $-6$ 完全正確！` },
-            { q: `${sqrtHTML('0.01')} = 0.1`, ans: true, exp: `因為 $(0.1)^2 = 0.01$，且取正平方根，所以等於 $0.1$！` }
+            { q: `&plusmn;0.3 是 0.9 的平方根。`, ans: false, exp: `(&plusmn;0.3)<sup>2</sup> = 0.09，所以 &plusmn;0.3 是 0.09 的平方根才對！` },
+            { q: `&minus;0.2 是 0.04 的平方根。`, ans: true, exp: `因為 (&minus;0.2)<sup>2</sup> = 0.04，只要平方等於 0.04 就是它的平方根之一！` },
+            { q: `${sqrtHTML('81')} = &plusmn;9`, ans: false, exp: `${sqrtHTML('81')} 前面沒有正負號，代表正平方根，只等於 +9！` },
+            { q: `81 的平方根為 &plusmn;9`, ans: true, exp: `中文問「81 的平方根」，有正有負，答案為 &plusmn;9！` },
+            { q: `0 的平方根為 0`, ans: true, exp: `0 的平方根只有一個，就是 0 本身。` },
+            { q: `&plusmn;${sqrtHTML('6')} 是 6 的平方根`, ans: true, exp: `正數 6 的平方根有兩個，記為 &plusmn;${sqrtHTML('6')}。` },
+            { q: `&minus;5 是 &minus;25 的平方根`, ans: false, exp: `負數沒有平方根！且 (&minus;5)<sup>2</sup> = +25，所以 &minus;5 是 +25 的平方根。` },
+            { q: `${sqrtHTML('(&minus;7)<sup>2</sup>')} = &minus;7`, ans: false, exp: `根號結果必 &ge; 0！${sqrtHTML('(&minus;7)<sup>2</sup>')} = ${sqrtHTML('49')} = +7！` },
+            { q: `16 的平方根是 4`, ans: false, exp: `問「16 的平方根」要把兩個都寫出來，是 &plusmn;4（只寫 4 漏掉負平方根了）！` },
+            { q: `${sqrtHTML('16')} 的平方根是 &plusmn;2`, ans: true, exp: `雙重陷阱題！先把 ${sqrtHTML('16')} 化簡成 4，題目就變成「4 的平方根」，答案是 &plusmn;2！` },
+            { q: `&minus;${sqrtHTML('36')} = &minus;6`, ans: true, exp: `負號在根號外面，代表 36 的負平方根，等於 &minus;6 完全正確！` },
+            { q: `${sqrtHTML('0.01')} = 0.1`, ans: true, exp: `因為 (0.1)<sup>2</sup> = 0.01，且取正平方根，所以等於 0.1！` }
         ];
 
         let soloIndex = 0;
