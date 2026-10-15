@@ -6,7 +6,7 @@
     <title>乘法公式三劍客</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- KaTeX -->
+    <!-- KaTeX for beautiful math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
@@ -20,10 +20,10 @@
             touch-action: manipulation;
         }
 
-        /* 面積道場：積木拖曳相關樣式 */
+        /* 面積道場：積木拖曳容器 */
         .drag-container {
             position: relative;
-            width: 700px; 
+            width: 720px; 
             height: 480px;
             background: #ffffff;
             border-radius: 16px;
@@ -54,8 +54,8 @@
             box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
             transition: box-shadow 0.2s, transform 0.1s;
             border-radius: 4px;
-            font-size: 0.95rem; /* 再次縮小中心字體以防與邊界重疊 */
             border: 1px solid rgba(255,255,255,0.4);
+            box-sizing: border-box;
         }
         .math-block:active {
             cursor: grabbing;
@@ -64,24 +64,34 @@
         .math-block.snapped {
             box-shadow: none;
             cursor: default;
-            transition: top 0.2s, left 0.2s; /* 貼齊平滑過渡 */
+            transition: top 0.2s, left 0.2s;
         }
 
-        /* 邊長標示 */
+        /* 邊長標示：絕對定位緊貼邊緣，確保與中心文字絕不重疊 */
         .edge-label {
             position: absolute;
             pointer-events: none;
             font-size: 11px;
-            opacity: 0.85; /* 稍微調低透明度降低視覺衝突 */
             font-family: 'Noto Sans TC', sans-serif;
             font-weight: bold;
+            opacity: 0.9;
         }
         .label-t { top: 2px; left: 50%; transform: translateX(-50%); }
-        .label-l { left: 2px; top: 50%; transform: translateY(-50%); }
+        .label-l { left: 4px; top: 50%; transform: translateY(-50%); }
         .label-b { bottom: 2px; left: 50%; transform: translateX(-50%); }
-        .label-r { right: 2px; top: 50%; transform: translateY(-50%); }
+        .label-r { right: 4px; top: 50%; transform: translateY(-50%); }
 
-        /* 拔河動畫相關樣式 */
+        /* 中心公式文字容器：保有足夠 Padding 避開邊緣標籤 */
+        .block-inner {
+            padding: 0 12px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.2;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* 拔河動畫與標記樣式 */
         .tug-line {
             position: relative;
             height: 12px;
@@ -94,7 +104,7 @@
         .tug-indicator {
             position: absolute;
             top: 50%;
-            left: 50%; /* 0的位置 */
+            left: 50%;
             transform: translate(-50%, -50%);
             width: 52px;
             height: 52px;
@@ -150,7 +160,6 @@
         .tab-btn.active { background-color: #4f46e5; color: white; }
         .sub-tab-btn.active { background-color: #e0e7ff; color: #4338ca; border-color: #6366f1; }
 
-        /* 修復按鈕文字與 KaTeX 公式重疊問題 */
         .sub-tab-btn, .formula-btn {
             display: inline-flex;
             align-items: center;
@@ -164,7 +173,7 @@
 </head>
 <body class="text-slate-800 h-screen flex flex-col">
 
-    <!-- 頂部導航 -->
+    <!-- 頂部導航列 -->
     <header class="bg-indigo-700 text-white p-4 shadow-lg flex flex-col md:flex-row justify-between items-center z-20 gap-4">
         <h1 class="text-2xl font-black tracking-wider flex items-center gap-2 text-center">
             ⚔️ 乘法公式三劍客
@@ -175,37 +184,37 @@
         </div>
     </header>
 
-    <!-- 內容區域 -->
+    <!-- 核心內容區域 -->
     <main class="flex-grow p-4 md:p-6 flex justify-center overflow-auto items-start">
         
         <!-- 分頁一：面積道場 -->
         <section id="tab1" class="w-full max-w-5xl flex flex-col items-center">
             
-            <!-- 子選單 -->
+            <!-- 三劍客子選單 -->
             <div class="flex gap-3 mb-6 flex-col md:flex-row flex-wrap justify-center w-full px-2">
-                <button onclick="loadPuzzle(1)" id="subTab1" class="sub-tab-btn w-full md:w-auto px-6 py-2 rounded-full font-bold border-2 border-slate-300 text-slate-600 transition hover:bg-slate-100"><span>和之盾</span> <span>$(A+B)^2$</span></button>
-                <button onclick="loadPuzzle(2)" id="subTab2" class="sub-tab-btn w-full md:w-auto px-6 py-2 rounded-full font-bold border-2 border-slate-300 text-slate-600 transition hover:bg-slate-100"><span>差之刃</span> <span>$(A-B)^2$</span></button>
-                <button onclick="loadPuzzle(3)" id="subTab3" class="sub-tab-btn w-full md:w-auto px-6 py-2 rounded-full font-bold border-2 border-slate-300 text-slate-600 transition hover:bg-slate-100"><span>雙刃戟</span> <span>$(A+B)(A-B)$</span></button>
+                <button onclick="loadPuzzle(1)" id="subTab1" class="sub-tab-btn w-full md:w-auto px-6 py-2 rounded-full font-bold border-2 border-slate-300 text-slate-600 transition hover:bg-slate-100"><span>🛡️ 和之盾</span> <span>$(A+B)^2 = A^2 + 2AB + B^2$</span></button>
+                <button onclick="loadPuzzle(2)" id="subTab2" class="sub-tab-btn w-full md:w-auto px-6 py-2 rounded-full font-bold border-2 border-slate-300 text-slate-600 transition hover:bg-slate-100"><span>🗡️ 差之刃</span> <span>$(A-B)^2 = A^2 - 2AB + B^2$</span></button>
+                <button onclick="loadPuzzle(3)" id="subTab3" class="sub-tab-btn w-full md:w-auto px-6 py-2 rounded-full font-bold border-2 border-slate-300 text-slate-600 transition hover:bg-slate-100"><span>🔱 雙刃戟</span> <span>$(A+B)(A-B) = A^2 - B^2$</span></button>
             </div>
             
-            <!-- 動態訊息區 -->
+            <!-- 動態操作提示 -->
             <div id="puzzleMessage" class="text-lg font-bold text-indigo-700 mb-4 h-8 text-center transition-opacity duration-300">
-                <!-- 訊息顯示於此 -->
+                <!-- 提示訊息 -->
             </div>
             
+            <!-- 拖曳畫布容器 -->
             <div class="overflow-x-auto w-full flex justify-center pb-4 relative">
-                <!-- 拖曳容器 -->
                 <div class="drag-container" id="dragContainer">
                     <div class="drop-zone" id="dropZone"></div>
-                    <!-- 積木將由 JS 動態生成 -->
+                    <!-- 積木由 JavaScript 動態生成 -->
                 </div>
             </div>
             
+            <!-- 成功過關提示 -->
             <div id="areaSuccessMsg" class="mt-4 p-4 bg-green-100 text-green-700 rounded-xl font-bold text-xl opacity-0 transition-opacity duration-500 shadow-md text-center max-w-2xl">
-                <!-- 成功訊息 -->
+                <!-- 成功回饋 -->
             </div>
         </section>
-
 
         <!-- 分頁二：極限拔河對決 -->
         <section id="tab2" class="w-full max-w-4xl hidden flex-col items-center pt-8">
@@ -225,7 +234,6 @@
                 <!-- 拔河數線 -->
                 <div class="px-8 relative" id="tugArena">
                     <div class="tug-line relative shadow-inner">
-                        <!-- 動態生成刻度 -->
                         <script>
                             for(let i=-10; i<=10; i+=2){
                                 document.write(`<div class="tug-mark" style="left: ${(i+10)*5}%">${i}</div>`);
@@ -235,7 +243,7 @@
                     </div>
                 </div>
                 
-                <!-- 互動控制區 -->
+                <!-- 戰鬥控制區 -->
                 <div class="mt-12 text-center min-h-[250px] flex flex-col items-center justify-center border-t-2 border-dashed border-gray-200 pt-8">
                     
                     <button id="btnDraw" onclick="drawQuestion()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 px-10 rounded-full text-2xl shadow-[0_6px_0_rgb(67,56,202)] active:shadow-[0_0px_0_rgb(67,56,202)] active:translate-y-1 transition-all">
@@ -281,23 +289,18 @@
         </div>
     </div>
 
-    <!-- 勝利畫面 -->
+    <!-- 勝利慶祝畫面 (內含睿帆認證數位印章) -->
     <div id="victoryOverlay" class="fixed inset-0 bg-slate-900 bg-opacity-95 hidden flex flex-col items-center justify-center z-50">
         <h2 class="text-5xl md:text-7xl font-black text-yellow-400 mb-6 animate-bounce text-center drop-shadow-lg">青龍陣營獲勝！</h2>
         <p class="text-2xl text-slate-300 mb-12 font-bold tracking-widest">極限拔河完全壓制</p>
         
-        <!-- 睿帆認證 SVG 印章 -->
         <div class="relative w-56 h-56 stamp-animate mb-12">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- 外框與內框 -->
                 <circle cx="50" cy="50" r="46" fill="none" stroke="#dc2626" stroke-width="4"/>
                 <circle cx="50" cy="50" r="40" fill="none" stroke="#dc2626" stroke-width="2"/>
-                <!-- 文字 -->
                 <text x="50" y="42" font-family="'Noto Sans TC', sans-serif" font-weight="900" font-size="22" fill="#dc2626" text-anchor="middle">睿帆</text>
                 <text x="50" y="72" font-family="'Noto Sans TC', sans-serif" font-weight="900" font-size="22" fill="#dc2626" text-anchor="middle">認證</text>
-                <!-- 裝飾線 -->
                 <line x1="20" y1="50" x2="80" y2="50" stroke="#dc2626" stroke-width="1.5" />
-                <!-- 磨損效果 (斑駁) -->
                 <path d="M 10,20 Q 30,30 20,50 T 10,80 M 90,20 Q 70,30 80,50 T 90,80" stroke="#0f172a" stroke-width="4" opacity="0.4" stroke-dasharray="2 6" fill="none"/>
             </svg>
         </div>
@@ -308,9 +311,7 @@
     </div>
 
     <script>
-        // ==========================================
-        // 核心渲染與切換邏輯
-        // ==========================================
+        // KaTeX 數學渲染函式
         function renderMath(element = document.body) {
             if (window.renderMathInElement) {
                 renderMathInElement(element, {
@@ -336,12 +337,12 @@
         }
 
         // ==========================================
-        // 模組一：面積道場 (資料驅動拖曳)
+        // 模組一：面積道場（含三劍客模組與幾何拼圖）
         // ==========================================
         const puzzles = {
             1: {
-                title: "請將積木拼入虛線框，證明和之盾",
-                msg: "🎉 完美契合！你成功證明了 $(A+B)^2 = A^2 + 2AB + B^2$",
+                title: "請將代數積木拼入虛線框，證明和之盾：$(A+B)^2 = A^2 + 2AB + B^2$",
+                msg: "🎉 完美契合！大正方形由 $A^2$、兩個 $AB$ 與 $B^2$ 完美組成！",
                 dropZone: { w: 240, h: 240, x: 380, y: 100 },
                 pieces: [
                     { id: 'p1_a2', w: 160, h: 160, x: 40, y: 40, tx: 0, ty: 0, z: 10, class: 'bg-blue-500 text-white', label: '$A^2$', edges: {t: 'A', l: 'A'} },
@@ -351,8 +352,8 @@
                 ]
             },
             2: {
-                title: "請依序將積木疊合在虛線框，證明差之刃",
-                msg: "🎉 重疊處被扣了兩次，補回 $B^2$ 後，剩下的純藍色區域即為 $(A-B)^2$",
+                title: "請操作積木覆蓋虛線框，證明差之刃：$(A-B)^2 = A^2 - 2AB + B^2$",
+                msg: "🎉 扣除兩次 $AB$ 後補回重複扣減的 $B^2$，順利得出 $(A-B)^2$！",
                 dropZone: { w: 200, h: 200, x: 380, y: 120 },
                 pieces: [
                     { id: 'p2_a2', w: 200, h: 200, x: 40, y: 40, tx: 0, ty: 0, z: 1, class: 'bg-blue-500 text-white', label: '$A^2$', edges: {t: 'A', l: 'A'} },
@@ -362,12 +363,12 @@
                 ]
             },
             3: {
-                title: "請將兩塊積木重組成一個大長方形，證明雙刃戟",
-                msg: "🎉 成功組合！$A^2 - B^2$ 被重新拼成寬 $(A+B)$ 高 $(A-B)$ 的長方形",
-                dropZone: { w: 350, h: 140, x: 330, y: 150 },
+                title: "請將積木組合，證明雙刃戟：$A^2 - B^2 = (A+B)(A-B)$",
+                msg: "🎉 成功組合！$A^2 - B^2$ 的面積轉化為長 $(A+B)$ 寬 $(A-B)$ 的矩形！",
+                dropZone: { w: 320, h: 140, x: 350, y: 150 },
                 pieces: [
-                    { id: 'p3_p1', w: 200, h: 140, x: 40, y: 50, tx: 0, ty: 0, z: 10, class: 'bg-blue-500 text-white', label: '$A(A-B)$', edges: {t: 'A', l: 'A-B'} },
-                    { id: 'p3_p2', w: 150, h: 140, x: 40, y: 220, tx: 200, ty: 0, z: 10, class: 'bg-orange-500 text-white', label: '$B(A-B)$', edges: {t: 'B', l: 'A-B'} }
+                    { id: 'p3_p1', w: 180, h: 140, x: 40, y: 50, tx: 0, ty: 0, z: 10, class: 'bg-blue-500 text-white', label: '$A(A-B)$', edges: {t: 'A', l: 'A-B'} },
+                    { id: 'p3_p2', w: 140, h: 140, x: 40, y: 220, tx: 180, ty: 0, z: 10, class: 'bg-orange-500 text-white', label: '$B(A-B)$', edges: {t: 'B', l: 'A-B'} }
                 ]
             }
         };
@@ -381,7 +382,6 @@
             currentPuzzleId = id;
             const p = puzzles[id];
             
-            // 更新 UI 狀態
             document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`subTab${id}`).classList.add('active');
             
@@ -389,26 +389,23 @@
             const successMsg = document.getElementById('areaSuccessMsg');
             successMsg.classList.add('opacity-0');
             successMsg.classList.remove('opacity-100');
-            successMsg.innerHTML = p.msg; // 將在完成時渲染 KaTeX
+            successMsg.innerHTML = p.msg;
 
             const container = document.getElementById('dragContainer');
             const dropZone = document.getElementById('dropZone');
             
-            // 清理現有積木
             document.querySelectorAll('.math-block').forEach(el => el.remove());
             blocksSnapped = 0;
             
-            // 設定 Drop Zone
             dropZone.style.width = p.dropZone.w + 'px';
             dropZone.style.height = p.dropZone.h + 'px';
             dropZone.style.left = p.dropZone.x + 'px';
             dropZone.style.top = p.dropZone.y + 'px';
             dropZone.classList.remove('success');
 
-            // 產生積木
             p.pieces.forEach(piece => {
                 const el = document.createElement('div');
-                el.className = `math-block whitespace-nowrap ${piece.class}`;
+                el.className = `math-block ${piece.class}`;
                 el.id = piece.id;
                 el.style.width = piece.w + 'px';
                 el.style.height = piece.h + 'px';
@@ -416,7 +413,7 @@
                 el.style.top = piece.y + 'px';
                 el.style.zIndex = piece.z;
                 
-                let innerHTML = `<span class="relative z-10 font-bold drop-shadow-md pointer-events-none px-8">${piece.label}</span>`;
+                let innerHTML = `<div class="block-inner">${piece.label}</div>`;
                 if (piece.edges) {
                     if (piece.edges.t) innerHTML += `<div class="edge-label label-t">$${piece.edges.t}$</div>`;
                     if (piece.edges.l) innerHTML += `<div class="edge-label label-l">$${piece.edges.l}$</div>`;
@@ -425,12 +422,10 @@
                 }
                 el.innerHTML = innerHTML;
                 
-                // 儲存目標全局座標
                 el.dataset.targetX = piece.tx + p.dropZone.x;
                 el.dataset.targetY = piece.ty + p.dropZone.y;
-                el.dataset.baseZ = piece.z; // 記住基礎 z-index 以利還原
+                el.dataset.baseZ = piece.z;
                 
-                // 綁定事件
                 el.addEventListener('mousedown', dragStart);
                 el.addEventListener('touchstart', dragStart, {passive: false});
                 
@@ -439,12 +434,12 @@
             renderMath(document.getElementById('tab1'));
         }
 
-        // 拖曳控制
+        // 拖曳互動邏輯
         function dragStart(e) {
-            if(e.target.classList.contains('snapped')) return;
+            if(e.target.classList.contains('snapped') || e.target.closest('.snapped')) return;
             e.preventDefault();
-            draggedEl = e.target;
-            draggedEl.style.zIndex = "100"; // 拖曳時置頂
+            draggedEl = e.target.closest('.math-block') || e.target;
+            draggedEl.style.zIndex = "100";
             
             const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
             const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
@@ -468,7 +463,6 @@
             let newLeft = clientX - startPosX;
             let newTop = clientY - startPosY;
             
-            // 邊界限制
             newLeft = Math.max(0, Math.min(newLeft, container.offsetWidth - draggedEl.offsetWidth));
             newTop = Math.max(0, Math.min(newTop, container.offsetHeight - draggedEl.offsetHeight));
 
@@ -484,14 +478,13 @@
             const targetX = parseInt(draggedEl.dataset.targetX);
             const targetY = parseInt(draggedEl.dataset.targetY);
 
-            // 判斷吸附 (距離 < 20px)
             const dist = Math.sqrt(Math.pow(currentX - targetX, 2) + Math.pow(currentY - targetY, 2));
             
-            if (dist < 20) {
+            if (dist < 25) {
                 draggedEl.style.left = targetX + 'px';
                 draggedEl.style.top = targetY + 'px';
                 draggedEl.classList.add('snapped');
-                draggedEl.style.zIndex = draggedEl.dataset.baseZ; // 恢復預設圖層順序
+                draggedEl.style.zIndex = draggedEl.dataset.baseZ;
                 blocksSnapped++;
                 checkPuzzleWin();
             } else {
@@ -513,14 +506,13 @@
                     msgEl.classList.remove('opacity-0');
                     msgEl.classList.add('opacity-100');
                     document.getElementById('dropZone').classList.add('success');
-                    renderMath(msgEl); // 渲染成功訊息內的 KaTeX
+                    renderMath(msgEl);
                 }, 300);
             }
         }
 
-
         // ==========================================
-        // 模組二：極限拔河對決 (遊戲邏輯)
+        // 模組二：極限拔河對決（遊戲邏輯與計分）
         // ==========================================
         const qBank = [
             { q: "103^2", t: 1, ans: "10609" },
@@ -545,7 +537,6 @@
             
             const qDisp = document.getElementById('questionDisplay');
             qDisp.innerHTML = '$' + activeQ.q + '$';
-            qDisp.removeAttribute('data-tex');
             renderMath(qDisp);
         }
 
@@ -560,14 +551,13 @@
             document.getElementById('inputAnswer').focus();
         }
 
-        // 清除答案中的空格以增加寬容度
         function cleanAns(str) {
             return str.replace(/\s+/g, '').toLowerCase();
         }
 
         function submitAnswer() {
             const userAns = document.getElementById('inputAnswer').value.trim();
-            if(!userAns) return showModal("錯誤", "請先輸入計算結果！");
+            if(!userAns) return showModal("提示", "請先輸入計算結果！");
 
             const isAnsCorrect = (cleanAns(userAns) === cleanAns(activeQ.ans));
             const isFormulaCorrect = (activeFormula === activeQ.t);
@@ -595,7 +585,7 @@
 
         function updateTugLine() {
             const indicator = document.getElementById('tugIndicator');
-            const pct = 50 + (tugPos * 5); // -10=0%, 0=50%, 10=100%
+            const pct = 50 + (tugPos * 5);
             indicator.style.left = `${pct}%`;
             indicator.textContent = tugPos;
             
@@ -623,7 +613,7 @@
         }
 
         // ==========================================
-        // 共用工具 (Modal & FX)
+        // 互動對話框與特效工具
         // ==========================================
         function showModal(title, msg, color = "text-slate-800") {
             const overlay = document.getElementById('modalOverlay');
@@ -656,10 +646,10 @@
             setTimeout(() => { if(el.parentNode) el.parentNode.removeChild(el); }, 1200);
         }
 
-        // 初始化
+        // 頁面載入初始化
         window.onload = () => {
             renderMath();
-            loadPuzzle(1); // 預設載入拼圖1
+            loadPuzzle(1);
         };
     </script>
 </body>
