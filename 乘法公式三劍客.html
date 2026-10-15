@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乘法公式三劍客の極限拔河對決</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 KaTeX 樣式與腳本 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <!-- 引入字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+            touch-action: manipulation; /* 改善觸控體驗 */
+        }
+
+        /* 面積道場：積木拖曳相關樣式 */
+        .drag-container {
+            position: relative;
+            width: 700px; /* 固定寬度以方便計算座標 */
+            height: 450px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .drop-zone {
+            position: absolute;
+            left: 300px; /* 放置於右側 */
+            top: 25px;
+            width: 400px;
+            height: 400px;
+            border: 3px dashed #cbd5e1;
+            background-color: #f8fafc;
+            box-sizing: border-box;
+        }
+        .math-block {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            border: 2px solid rgba(0,0,0,0.1);
+            user-select: none;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transition: box-shadow 0.2s, transform 0.1s;
+        }
+        .math-block:active {
+            cursor: grabbing;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+            z-index: 50 !important;
+        }
+        .math-block.snapped {
+            box-shadow: none;
+            cursor: default;
+            transition: top 0.2s, left 0.2s; /* 貼齊時的平滑過渡 */
+        }
+        
+        /* 積木顏色定義 */
+        .bg-a2 { background-color: #3b82f6; color: white; } /* Blue */
+        .bg-b2 { background-color: #f97316; color: white; } /* Orange */
+        .bg-ab { background-color: #22c55e; color: white; } /* Green */
+
+        /* 拔河動畫相關樣式 */
+        .tug-line {
+            position: relative;
+            height: 12px;
+            background: #cbd5e1;
+            border-radius: 6px;
+            width: 100%;
+            margin-top: 40px;
+            margin-bottom: 60px;
+        }
+        .tug-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%; /* 初始位置 0 (中心) */
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background-color: #ef4444;
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* 彈性滑動效果 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            z-index: 10;
+        }
+        .tug-mark {
+            position: absolute;
+            top: 15px;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* 浮動戰鬥文字動畫 */
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(-50%, 0) scale(0.5); }
+            50% { transform: translate(-50%, -40px) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -80px) scale(1); }
+        }
+        .combat-text {
+            position: absolute;
+            left: 50%;
+            top: 30%; /* 在指示器上方 */
+            font-size: 2rem;
+            font-weight: 900;
+            text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff;
+            pointer-events: none;
+            animation: floatUp 1.2s ease-out forwards;
+            z-index: 100;
+        }
+
+        /* 勝利印章動畫 */
+        @keyframes stampDrop {
+            0% { opacity: 0; transform: scale(3) rotate(-20deg); }
+            50% { opacity: 1; transform: scale(0.9) rotate(15deg); }
+            100% { transform: scale(1) rotate(12deg); }
+        }
+        .stamp-animate {
+            animation: stampDrop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* 隱藏元素用 */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col">
+
+    <!-- 頂部導航與標題 -->
+    <header class="bg-indigo-600 text-white p-4 shadow-md flex justify-between items-center z-20">
+        <h1 class="text-2xl font-black tracking-wider flex items-center gap-2">
+            ⚔️ 乘法公式三劍客
+        </h1>
+        <div class="flex gap-2 bg-indigo-800 p-1 rounded-lg">
+            <button id="tabBtn1" onclick="switchTab(1)" class="px-4 py-2 rounded-md bg-indigo-500 font-bold transition">面積道場</button>
+            <button id="tabBtn2" onclick="switchTab(2)" class="px-4 py-2 rounded-md hover:bg-indigo-500 font-bold transition">極限拔河對決</button>
+        </div>
+    </header>
+
+    <!-- 內容區域 -->
+    <main class="flex-grow p-4 md:p-8 flex justify-center overflow-auto">
+        
+        <!-- 分頁一：面積道場 -->
+        <section id="tab1" class="w-full max-w-5xl flex flex-col items-center">
+            <div class="text-center mb-4">
+                <h2 class="text-2xl font-bold text-indigo-700">任務：拼出和之盾 <span class="math-katex">(A+B)^2</span></h2>
+                <p class="text-slate-600 mt-1">請將左側的代數積木，拖曳到右側的虛線框內完美拼合。</p>
+            </div>
+            
+            <div class="overflow-x-auto w-full flex justify-center pb-4">
+                <!-- 拖曳容器：設定固定尺寸以簡化座標運算 -->
+                <div class="drag-container" id="dragContainer">
+                    <div class="drop-zone" id="dropZone"></div>
+                    <!-- 積木會在 JS 中動態生成 -->
+                </div>
+            </div>
+            
+            <div id="areaSuccessMsg" class="mt-4 p-4 bg-green-100 text-green-700 rounded-lg font-bold text-lg opacity-0 transition-opacity duration-500">
+                🎉 完美契合！你成功證明了 $(A+B)^2 = A^2 + 2AB + B^2$
+            </div>
+        </section>
+
+
+        <!-- 分頁二：極限拔河對決 -->
+        <section id="tab2" class="w-full max-w-4xl hidden flex-col items-center">
+            
+            <!-- 戰鬥場景面板 -->
+            <div class="w-full bg-white rounded-2xl shadow-xl p-6 relative overflow-hidden border-4 border-indigo-100">
+                <div class="flex justify-between items-center mb-8 px-4">
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-blue-600 mb-1">青龍陣營</div>
+                        <div class="text-sm font-bold text-slate-500 bg-blue-100 px-2 py-1 rounded">目標：拉過來 (-10)</div>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-300">VS</div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-orange-600 mb-1">白虎陣營</div>
+                        <div class="text-sm font-bold text-slate-500 bg-orange-100 px-2 py-1 rounded">起點：(0)</div>
+                    </div>
+                </div>
+
+                <!-- 拔河數線 -->
+                <div class="px-8 relative" id="tugArena">
+                    <div class="tug-line relative">
+                        <!-- 動態生成刻度 -->
+                        <script>
+                            for(let i=-10; i<=10; i+=2){
+                                document.write(`<div class="tug-mark" style="left: ${(i+10)*5}%">${i}</div>`);
+                            }
+                        </script>
+                        <!-- 指示器 (繩子中心) -->
+                        <div id="tugIndicator" class="tug-indicator">0</div>
+                    </div>
+                </div>
+                
+                <!-- 互動控制區 -->
+                <div class="mt-8 text-center min-h-[250px] flex flex-col items-center justify-center border-t-2 border-dashed border-gray-200 pt-6">
+                    
+                    <!-- 狀態 1: 抽題按鈕 -->
+                    <button id="btnDraw" onclick="drawQuestion()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-8 rounded-full text-xl shadow-[0_4px_0_rgb(67,56,202)] active:shadow-[0_0px_0_rgb(67,56,202)] active:translate-y-1 transition-all">
+                        ⚔️ 抽取魔物
+                    </button>
+
+                    <!-- 狀態 2: 答題區 (初始隱藏) -->
+                    <div id="quizArea" class="hidden w-full flex-col items-center animate-[fadeIn_0.3s]">
+                        <div class="bg-slate-800 text-yellow-300 px-6 py-3 rounded-lg text-3xl font-black shadow-inner mb-6 w-full max-w-md text-center tracking-widest math-katex" id="questionDisplay">
+                            <!-- 題目顯示區 -->
+                        </div>
+                        
+                        <p class="text-slate-600 mb-3 font-bold">請選擇對應的劍客（公式）：</p>
+                        
+                        <div class="flex gap-3 mb-6 flex-wrap justify-center">
+                            <button onclick="selectFormula(1, this)" class="formula-btn flex-1 border-2 border-blue-400 text-blue-700 bg-blue-50 font-bold py-2 px-4 rounded-lg hover:bg-blue-100 transition">
+                                🛡️ 和之盾<br><span class="text-xs">$(A+B)^2$</span>
+                            </button>
+                            <button onclick="selectFormula(2, this)" class="formula-btn flex-1 border-2 border-red-400 text-red-700 bg-red-50 font-bold py-2 px-4 rounded-lg hover:bg-red-100 transition">
+                                🗡️ 差之刃<br><span class="text-xs">$(A-B)^2$</span>
+                            </button>
+                            <button onclick="selectFormula(3, this)" class="formula-btn flex-1 border-2 border-purple-400 text-purple-700 bg-purple-50 font-bold py-2 px-4 rounded-lg hover:bg-purple-100 transition">
+                                🔱 雙刃戟<br><span class="text-xs">$(A+B)(A-B)$</span>
+                            </button>
+                        </div>
+
+                        <!-- 輸入答案區 (選擇公式後顯示) -->
+                        <div id="answerArea" class="hidden flex gap-2">
+                            <input type="number" id="inputAnswer" placeholder="輸入計算結果..." class="border-2 border-slate-300 rounded-lg px-4 py-2 text-xl font-bold w-48 text-center focus:outline-none focus:border-indigo-500">
+                            <button onclick="submitAnswer()" class="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-6 rounded-lg shadow-[0_4px_0_rgb(21,128,61)] active:translate-y-1 active:shadow-none transition-all text-lg">
+                                發動攻擊
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 共用對話框 (取代 alert) -->
+    <div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl text-center transform scale-95 transition-transform duration-200" id="modalBox">
+            <h3 id="modalTitle" class="text-3xl font-black mb-2">標題</h3>
+            <p id="modalMsg" class="text-lg text-slate-600 mb-6 font-bold">訊息內容</p>
+            <button onclick="closeModal()" class="bg-indigo-600 text-white font-bold py-2 px-8 rounded-full hover:bg-indigo-500 w-full">確認</button>
+        </div>
+    </div>
+
+    <!-- 勝利畫面 -->
+    <div id="victoryOverlay" class="fixed inset-0 bg-slate-900 bg-opacity-90 hidden flex flex-col items-center justify-center z-50">
+        <h2 class="text-5xl md:text-7xl font-black text-yellow-400 mb-4 animate-bounce text-center">青龍陣營獲勝！</h2>
+        <p class="text-2xl text-white mb-12">你已精通乘法公式三劍客的奧義</p>
+        
+        <!-- 睿帆認證 SVG 印章 -->
+        <div class="relative w-48 h-48 stamp-animate">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- 外框與內框 -->
+                <rect x="5" y="5" width="90" height="90" fill="none" stroke="#dc2626" stroke-width="4" rx="10"/>
+                <rect x="12" y="12" width="76" height="76" fill="none" stroke="#dc2626" stroke-width="2" rx="5"/>
+                <!-- 文字 -->
+                <text x="50" y="45" font-family="'Noto Sans TC', sans-serif" font-weight="900" font-size="28" fill="#dc2626" text-anchor="middle">睿帆</text>
+                <text x="50" y="80" font-family="'Noto Sans TC', sans-serif" font-weight="900" font-size="28" fill="#dc2626" text-anchor="middle">認證</text>
+                <!-- 磨損效果 (使用簡單的路徑蓋過) -->
+                <path d="M 0,20 L 100,30 M 0,70 L 100,65 M 30,0 L 40,100 M 70,0 L 65,100" stroke="#slate-900" stroke-width="3" opacity="0.3" stroke-dasharray="2 4"/>
+            </svg>
+        </div>
+        
+        <button onclick="resetGame()" class="mt-12 bg-white text-slate-900 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition text-xl">
+            重新挑戰
+        </button>
+    </div>
+
+    <!-- 腳本邏輯 -->
+    <script>
+        // ---------------------------------------------------
+        // 全局通用功能
+        // ---------------------------------------------------
+        
+        // 渲染 KaTeX
+        function renderMath() {
+            const elements = document.querySelectorAll('.math-katex');
+            elements.forEach(el => {
+                // 從 innerHTML 抓取公式文字，避免重複渲染
+                let text = el.getAttribute('data-tex') || el.innerHTML;
+                el.setAttribute('data-tex', text); 
+                try {
+                    katex.render(text, el, {
+                        throwOnError: false,
+                        displayMode: false
+                    });
+                } catch (e) { console.error(e); }
+            });
+        }
+
+        // 切換分頁
+        function switchTab(tabNum) {
+            document.getElementById('tab1').classList.add('hidden');
+            document.getElementById('tab2').classList.add('hidden');
+            document.getElementById('tabBtn1').classList.replace('bg-indigo-500', 'bg-transparent');
+            document.getElementById('tabBtn2').classList.replace('bg-indigo-500', 'bg-transparent');
+            
+            document.getElementById(`tab${tabNum}`).classList.remove('hidden');
+            document.getElementById(`tabBtn${tabNum}`).classList.add('bg-indigo-500');
+            
+            if(tabNum === 1) initDragAndDrop(); // 切換到道場時重置積木
+        }
+
+        // 自訂 Modal 訊息
+        function showModal(title, msg, titleColorClass = "text-slate-800") {
+            const overlay = document.getElementById('modalOverlay');
+            const box = document.getElementById('modalBox');
+            const titleEl = document.getElementById('modalTitle');
+            
+            titleEl.textContent = title;
+            titleEl.className = `text-3xl font-black mb-2 ${titleColorClass}`;
+            document.getElementById('modalMsg').textContent = msg;
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => box.classList.remove('scale-95'), 10);
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modalOverlay');
+            const box = document.getElementById('modalBox');
+            box.classList.add('scale-95');
+            setTimeout(() => overlay.classList.add('hidden'), 200);
+            
+            if(gameLogic.tugPosition <= -10) {
+                document.getElementById('victoryOverlay').classList.remove('hidden');
+            }
+        }
+
+        // ---------------------------------------------------
+        // 模組一：面積道場 (拖曳邏輯)
+        // ---------------------------------------------------
+        
+        const A_SIZE = 250;
+        const B_SIZE = 150;
+        // 定義積木初始位置與目標位置 (相對於 dropZone 的左上角)
+        const blockConfigs = [
+            { id: 'a2', type: 'bg-a2', w: A_SIZE, h: A_SIZE, startX: 20, startY: 20, targetX: 0, targetY: 0, label: 'A^2' },
+            { id: 'b2', type: 'bg-b2', w: B_SIZE, h: B_SIZE, startX: 20, startY: 280, targetX: A_SIZE, targetY: A_SIZE, label: 'B^2' },
+            { id: 'abh', type: 'bg-ab', w: A_SIZE, h: B_SIZE, startX: 280, startY: 420, targetX: 0, targetY: A_SIZE, label: 'AB' }, // 水平
+            { id: 'abv', type: 'bg-ab', w: B_SIZE, h: A_SIZE, startX: 540, startY: 20, targetX: A_SIZE, targetY: 0, label: 'AB' }  // 垂直
+        ];
+
+        let draggedEl = null;
+        let startPosX = 0, startPosY = 0;
+        let blocksSnapped = 0;
+
+        function initDragAndDrop() {
+            const container = document.getElementById('dragContainer');
+            const dropZone = document.getElementById('dropZone');
+            
+            // 清除現有積木
+            document.querySelectorAll('.math-block').forEach(el => el.remove());
+            blocksSnapped = 0;
+            document.getElementById('areaSuccessMsg').classList.add('opacity-0');
+
+            blockConfigs.forEach(conf => {
+                const el = document.createElement('div');
+                el.className = `math-block ${conf.type} math-katex rounded`;
+                el.id = conf.id;
+                el.style.width = conf.w + 'px';
+                el.style.height = conf.h + 'px';
+                // 初始位置設定在容器內 (未進入虛線框)
+                el.style.left = conf.startX + 'px';
+                el.style.top = conf.startY + 'px';
+                el.innerHTML = conf.label;
+                el.dataset.targetX = conf.targetX;
+                el.dataset.targetY = conf.targetY;
+                
+                // 綁定事件 (支援滑鼠與觸控)
+                el.addEventListener('mousedown', dragStart);
+                el.addEventListener('touchstart', dragStart, {passive: false});
+                
+                container.appendChild(el);
+            });
+            renderMath();
+        }
+
+        function dragStart(e) {
+            if(e.target.classList.contains('snapped')) return; // 已吸附不給拖
+            e.preventDefault();
+            draggedEl = e.target;
+            draggedEl.style.zIndex = "100";
+            
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            
+            startPosX = clientX - draggedEl.offsetLeft;
+            startPosY = clientY - draggedEl.offsetTop;
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchmove', dragMove, {passive: false});
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!draggedEl) return;
+            e.preventDefault();
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            
+            let newLeft = clientX - startPosX;
+            let newTop = clientY - startPosY;
+            
+            // 限制在容器內
+            const container = document.getElementById('dragContainer');
+            newLeft = Math.max(0, Math.min(newLeft, container.offsetWidth - draggedEl.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, container.offsetHeight - draggedEl.offsetHeight));
+
+            draggedEl.style.left = newLeft + 'px';
+            draggedEl.style.top = newTop + 'px';
+        }
+
+        function dragEnd(e) {
+            if (!draggedEl) return;
+            
+            // 計算釋放位置是否接近目標 (相對於 dropZone)
+            const dropZone = document.getElementById('dropZone');
+            const dropZoneLeft = dropZone.offsetLeft;
+            const dropZoneTop = dropZone.offsetTop;
+            
+            const currentX = parseInt(draggedEl.style.left);
+            const currentY = parseInt(draggedEl.style.top);
+            
+            const targetX = parseInt(draggedEl.dataset.targetX) + dropZoneLeft;
+            const targetY = parseInt(draggedEl.dataset.targetY) + dropZoneTop;
+
+            // 判斷距離 (容錯率 30px)
+            const dist = Math.sqrt(Math.pow(currentX - targetX, 2) + Math.pow(currentY - targetY, 2));
+            
+            if (dist < 30) {
+                // 吸附
+                draggedEl.style.left = targetX + 'px';
+                draggedEl.style.top = targetY + 'px';
+                draggedEl.classList.add('snapped');
+                draggedEl.style.zIndex = "10";
+                blocksSnapped++;
+                
+                checkAreaWin();
+            } else {
+                draggedEl.style.zIndex = "1";
+            }
+
+            // 清理事件
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('touchend', dragEnd);
+            draggedEl = null;
+        }
+
+        function checkAreaWin() {
+            if(blocksSnapped === 4) {
+                setTimeout(() => {
+                    document.getElementById('areaSuccessMsg').classList.remove('opacity-0');
+                    // 更新大框顏色增加回饋
+                    document.getElementById('dropZone').style.borderColor = '#22c55e';
+                    document.getElementById('dropZone').style.backgroundColor = '#f0fdf4';
+                }, 300);
+            }
+        }
+
+
+        // ---------------------------------------------------
+        // 模組二：極限拔河對決 (遊戲邏輯)
+        // ---------------------------------------------------
+        
+        const questionBank = [
+            { q: "103^2", type: 1, ans: "10609" },
+            { q: "105^2", type: 1, ans: "11025" },
+            { q: "98^2", type: 2, ans: "9604" },
+            { q: "99^2", type: 2, ans: "9801" },
+            { q: "52 \\times 48", type: 3, ans: "2496" },
+            { q: "201 \\times 199", type: 3, ans: "39999" },
+            { q: "(10+0.1)^2", type: 1, ans: "102.01" }
+        ];
+
+        const gameLogic = {
+            tugPosition: 0, // -10 (青龍) 到 10 (白虎)
+            currentQ: null,
+            selectedFormula: null
+        };
+
+        function resetGame() {
+            gameLogic.tugPosition = 0;
+            updateTugVisuals();
+            document.getElementById('victoryOverlay').classList.add('hidden');
+            resetQuizUI();
+        }
+
+        function resetQuizUI() {
+            document.getElementById('btnDraw').classList.remove('hidden');
+            document.getElementById('quizArea').classList.add('hidden');
+            document.getElementById('answerArea').classList.add('hidden');
+            document.getElementById('inputAnswer').value = '';
+            gameLogic.selectedFormula = null;
+            
+            // 重置按鈕樣式
+            document.querySelectorAll('.formula-btn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-indigo-500', 'scale-105');
+            });
+        }
+
+        function drawQuestion() {
+            // 隨機抽題
+            const idx = Math.floor(Math.random() * questionBank.length);
+            gameLogic.currentQ = questionBank[idx];
+            
+            // 更新介面
+            document.getElementById('btnDraw').classList.add('hidden');
+            document.getElementById('quizArea').classList.remove('hidden');
+            
+            const qDisp = document.getElementById('questionDisplay');
+            qDisp.innerHTML = gameLogic.currentQ.q;
+            qDisp.removeAttribute('data-tex'); // 強制重新渲染
+            renderMath();
+        }
+
+        function selectFormula(type, btnEl) {
+            gameLogic.selectedFormula = type;
+            
+            // UI 視覺回饋
+            document.querySelectorAll('.formula-btn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-indigo-500', 'scale-105');
+            });
+            btnEl.classList.add('ring-4', 'ring-indigo-500', 'scale-105');
+            
+            // 顯示輸入區
+            document.getElementById('answerArea').classList.remove('hidden');
+            document.getElementById('answerArea').classList.add('animate-[fadeIn_0.3s]');
+            document.getElementById('inputAnswer').focus();
+        }
+
+        function submitAnswer() {
+            const inputVal = document.getElementById('inputAnswer').value.trim();
+            if(!inputVal) {
+                showModal("提示", "請輸入計算結果！", "text-slate-800");
+                return;
+            }
+
+            const isAnsCorrect = (inputVal === gameLogic.currentQ.ans);
+            const isFormulaCorrect = (gameLogic.selectedFormula === gameLogic.currentQ.type);
+            
+            let moveSteps = 0;
+
+            if(isAnsCorrect && isFormulaCorrect) {
+                moveSteps = -2; // 青龍方向
+                showCombatText("⚔️ 完全擊殺 -2", "text-red-500");
+                showModal("太神啦！完全擊殺！", `選對公式且計算正確！\n答案就是 ${gameLogic.currentQ.ans}，拔河繩移動 2 格！`, "text-red-600");
+            } else if (isAnsCorrect && !isFormulaCorrect) {
+                moveSteps = -1;
+                showCombatText("🔪 擦傷 -1", "text-yellow-500");
+                showModal("擦傷！", `雖然算對了 (${gameLogic.currentQ.ans})，但你選錯劍客囉！\n只能發揮一半威力，移動 1 格。`, "text-yellow-600");
+            } else {
+                moveSteps = 0;
+                showCombatText("💨 揮空", "text-slate-500");
+                showModal("揮空！", `計算錯誤。這題的正確答案是 ${gameLogic.currentQ.ans}。\n請再接再厲！`, "text-slate-600");
+            }
+
+            // 更新狀態與畫面
+            gameLogic.tugPosition += moveSteps;
+            // 限制在 -10 
+            if(gameLogic.tugPosition < -10) gameLogic.tugPosition = -10;
+            
+            updateTugVisuals();
+            resetQuizUI(); // 準備下一回合
+        }
+
+        function updateTugVisuals() {
+            const indicator = document.getElementById('tugIndicator');
+            // 計算百分比位置：-10 對應 0%，0 對應 50%，10 對應 100%
+            const pct = 50 + (gameLogic.tugPosition * 5); 
+            indicator.style.left = `${pct}%`;
+            indicator.textContent = gameLogic.tugPosition;
+            
+            // 顏色變化
+            if(gameLogic.tugPosition < 0) {
+                indicator.style.backgroundColor = '#3b82f6'; // 偏向青龍藍
+            } else if (gameLogic.tugPosition > 0) {
+                indicator.style.backgroundColor = '#f97316'; // 偏向白虎橘 (目前不會發生，預留)
+            } else {
+                indicator.style.backgroundColor = '#ef4444'; // 居中紅
+            }
+        }
+
+        function showCombatText(text, colorClass) {
+            const arena = document.getElementById('tugArena');
+            const el = document.createElement('div');
+            el.className = `combat-text ${colorClass}`;
+            el.textContent = text;
+            arena.appendChild(el);
+            
+            // 動畫結束後移除
+            setTimeout(() => {
+                if(el.parentNode) el.parentNode.removeChild(el);
+            }, 1200);
+        }
+
+        // ---------------------------------------------------
+        // 頁面載入初始化
+        // ---------------------------------------------------
+        window.onload = () => {
+            renderMath();
+            initDragAndDrop();
+        };
+
+    </script>
+</body>
+</html>
