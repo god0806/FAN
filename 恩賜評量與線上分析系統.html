@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恩賜評量與線上分析系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .radio-btn-group input:checked + div {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .radio-btn-group input:focus + div {
+            box-shadow: 0 0 0 2px #93c5fd;
+        }
+
+        .bar-fill {
+            transition: width 1s ease-out;
+        }
+
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="antialiased min-h-screen pb-20">
+
+    <!-- 標題與介紹區 -->
+    <header class="bg-blue-600 text-white py-12 px-4 shadow-md">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-3xl md:text-5xl font-bold mb-4">恩賜評量與線上分析系統</h1>
+            <p class="text-lg md:text-xl text-blue-100 mb-6">發掘神賜給你的獨特禮物與呼召</p>
+            
+            <div class="bg-blue-700/50 rounded-xl p-6 text-left inline-block max-w-2xl mx-auto shadow-inner">
+                <h2 class="text-xl font-semibold mb-3 border-b border-blue-400 pb-2">填寫說明</h2>
+                <p class="mb-4 text-blue-50">請依據您的「實際情況」作答，而非期望達到的程度。對每一道題目，請選擇最符合您狀況的分數：</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-medium">
+                    <div class="bg-white/10 p-2 rounded-lg"><span class="text-2xl font-bold block mb-1">4</span>確實如此</div>
+                    <div class="bg-white/10 p-2 rounded-lg"><span class="text-2xl font-bold block mb-1">2</span>常常如此</div>
+                    <div class="bg-white/10 p-2 rounded-lg"><span class="text-2xl font-bold block mb-1">1</span>偶爾如此</div>
+                    <div class="bg-white/10 p-2 rounded-lg"><span class="text-2xl font-bold block mb-1">0</span>從未如此</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8 relative">
+        
+        <!-- 表單區 -->
+        <section id="form-section" class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <form id="assessment-form">
+                <div id="questions-container" class="space-y-6">
+                    <!-- 動態生成題目 -->
+                </div>
+
+                <!-- 底部懸浮按鈕區 -->
+                <div class="sticky bottom-4 mt-12 bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-gray-200 shadow-xl flex justify-center z-10">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-3 px-12 rounded-full transition-all transform hover:scale-105 shadow-md flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        計算與分析結果
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 結果分析區 -->
+        <section id="results-section" class="hidden animate-fade-in-up">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">您的專屬恩賜分析</h2>
+                <p class="text-gray-600">根據您的填寫，以下是系統為您整理出的恩賜傾向。</p>
+            </div>
+
+            <!-- Top 3 卡片 -->
+            <h3 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />
+                </svg>
+                您的主要恩賜 (Top 3)
+            </h3>
+            <div id="top-3-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <!-- 動態插入 Top 3 -->
+            </div>
+
+            <!-- 所有恩賜長條圖 -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">各項恩賜得分總覽</h3>
+                <div class="text-sm text-gray-500 mb-4">* 滿分為 20 分 (5題 × 4分)</div>
+                <div id="all-scores-container" class="space-y-4">
+                    <!-- 動態插入長條圖 -->
+                </div>
+                
+                <div class="mt-12 text-center border-t pt-8">
+                    <button id="btn-retake" class="text-blue-600 border border-blue-600 hover:bg-blue-50 font-bold py-2 px-8 rounded-full transition-colors">
+                        重新測驗
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 自訂訊息框 (取代 Alert) -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 relative">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-center text-gray-800 mb-2">未完成作答</h3>
+            <p id="modal-message" class="text-center text-gray-600 mb-6">您還有題目尚未填寫完成，請確認所有題目都已勾選。</p>
+            <button id="btn-close-modal" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                我知道了，返回檢查
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 資料設定區
+        const questionsList = [
+            "能給予個人具體又實際的聖經話語", "對學習聖經真理，能夠喜樂又專心地投入很多時間", "因堅信神的話語，所以非常清楚生命的目的", "因著你的禱告，使人的疾病得痊癒", "透過超自然的神蹟，證明神的存在",
+            "靠著聖靈，適切地傳達神對個人的心意", "能分辨人純正與不純正的動機", "禱告時，能從神領受自己不懂得語言", "能立即明白方言的內容，並清楚傳達方言的信息", "開創教會，並投注心力發展健康的教會",
+            "解析聖經，並恰當地按個人特質傳達神的話語", "能正確分辨對方的需要", "設定目標並傳達給人", "經常有人因你的安慰和建言而得醫治與修復", "超越主日奉獻和十一奉獻",
+            "能給予許多人同心合一的動機", "同情和憐憫可憐的人，並給予幫助", "想到未信者無法得到救恩時，會有極深的不安", "喜歡養育和造就人，並使他們跟隨耶穌", "能使新朋友感覺溫暖友善",
+            "能以各種材料製作出實用又精美的物品", "一天能有三小時以上的強烈禱告", "以讚美、戲劇、樂器、美術、舞蹈等才藝尊榮神", "默想神的話語，並具體活出神的話語", "有發掘聖經中的話語、基督教思想和信息的能力，且分析和分類能力",
+            "因神的應許必會成就，所以常常充滿勇氣和信心", "確信神能醫治一切疾病", "當勇敢宣告行神蹟的神時，周圍便發生神蹟", "能從神直接領受話語來勉勵或責備人", "能分辨對方所說的話是真實或虛謊",
+            "能以別國的語言或不能理解的語言熱切禱告", "能了解別人所說的方言，並傳達給對方", "有教導教會領袖的特別能力", "能向人解釋聖經真理，並使人順服真理", "能非常愉快地助人",
+            "能有使服事充滿果效的組織能力", "能看出人的潛能，並用話語扶助人", "歡喜為主奉獻財物", "能使共同體組織化，進而使服事有果效", "視別人的痛苦為自己的痛苦",
+            "與不信者對話時，常常引導到福音的方向", "對屬靈嬰孩的靈魂有負擔，能以愛和忍耐養育他們", "常邀請客人到家中，並營造親密的關係", "善於使用各種工具與器具", "喜歡禱告",
+            "關心現代人文化，透過文化事工傳揚耶穌", "能以直覺輕易地解決難題", "對於解經或翻譯的辛苦甘之如飴", "毫不懷疑神的話語，倚靠神的話語為將來服事的預備", "一旦有人生病，會找你為病人醫治禱告",
+            "成為神彰顯祂超自然能力的器皿", "能以神所賜的話語或警告來為人引導方向", "能分辨聖靈和邪靈的工作", "用方言禱告時，能更強烈的禱告", "清楚知道自己所說的方言內容",
+            "熱切地想去農村或宣教地點開拓教會", "許多人說，他們因著你而更深入了解聖經", "單單以幫助對方為理由就感到非常快樂", "傳遞異象，並使人產生一同服事的動機", "在給他人建言時，更加發現自己各種狀況",
+            "敏感地知道他人在財務上的需要", "會賦予動機，使人自發式的合作，共同達成目標", "能體會身體上有苦痛或精神上有壓制的人", "能輕鬆地與陌生人對話", "人們以你的話語和行為做榜樣，並跟隨你的決定",
+            "充滿仁慈，使人感到舒適", "平常常聽到別人形容你的手藝精巧", "常有人要你為他們禱告", "想以各種藝術型態來敬拜神", "面對特別情況時，神的話會提示具體解決方式",
+            "為要得著真理，享受於研讀聖經的樂趣", "無論何種困難中，能夠確信因神的幫助而成就美善", "為病人禱告時會感受到溫暖", "神會透過你，帶來許多超乎尋常的現象", "對於即將發生的事件，神賜給你預先感受的靈敏度",
+            "可迅速地明白他人對聖經的解釋或使用是否合宜", "用方言禱告更有果效", "能了解沒有學過的語言，且能傳達其中的意義", "特別關心無法自立的教會和無法負責的牧者", "擅用聖經的話語，並給予簡潔又實際的教訓",
+            "因著你的幫助，許多人發揮恩賜且嶄露頭角", "能夠適才適所地配置人力", "擅於理解聖經，必提供適合的話語給有需要的人", "盡全力幫助周圍有困難的人", "自己無法做所有的事，但能動員他人，使工作完成",
+            "能發現需要幫助的人，並實際幫助及施憐憫予人", "許多人因你的講道而得救恩", "能幫助人發掘恩賜，使他們服事基督身體的教會", "喜歡為人提供飲食和住所", "善於將家裡或教會內部佈置的美崙美奐",
+            "可以長時間禱告，而且禱告經常蒙應允", "常從他人口裏聽到極富創意的話", "能在適當的時間和地點，善加運用過去曾背過的及學過的真理", "擁有知識和洞察力來幫助教會和聖徒", "相信神供應一切所需",
+            "為了施行醫治，神的同在極為敏銳", "使不信者看見神超自然的醫治，經常傳福音", "不會懼怕公開談話，並堅定地提出話語的準則", "能分辨人的行為和話語是出自信仰或屬肉體的動機", "能以未曾學過的語言讚美神",
+            "能以方言為別人建立信心或讚美神", "為了未得之地而憂傷，迫切希望該地能建立教會", "為了教導別人，而喜歡研讀聖經", "能夠承擔不起眼、看來沒有功勞、甚至卑賤的事", "仔細規劃，事先做詳細規劃",
+            "經常應邀去做協談", "為了奉獻和周濟而願意過簡樸生活", "明白現在所處位置，也知道下階段的方向", "能實際滿足弱勢團體在經濟、精神及屬靈的需要", "在禱告時會將焦點放在傳福音的對象上",
+            "積極尋找需要幫助的聖徒，並和他們一起禱告", "能找出和睦相處的方式", "能為服事上所需的物品提供設計或構想", "真誠接受他人的代禱請求，並規劃時間禱告", "盼望以多樣創新的方法來表明福音"
+        ];
+
+        const categories = [
+            { name: "智慧", qs: [1,24,47,70,93], trait: "洞悉複雜局勢，給出合神心意見解。", suggest: "參與決策、策略規劃、教牧輔導。" },
+            { name: "知識", qs: [2,25,48,71,94], trait: "渴望深入研讀真理，具備豐富聖經基礎。", suggest: "帶領查經班、編寫教材、從事教導。" },
+            { name: "信心", qs: [3,26,49,72,95], trait: "對神應許深信不疑，在艱難中堅固團隊。", suggest: "異象推動、開拓事工、禱告守望。" },
+            { name: "醫病", qs: [4,27,50,73,96], trait: "成為神醫治的器皿，為身心靈的恢復禱告。", suggest: "探訪、醫治釋放、關懷服事。" },
+            { name: "能力", qs: [5,28,51,74,97], trait: "透過超自然彰顯證明神的真實與大能。", suggest: "佈道會、前線福音事工。" },
+            { name: "預言", qs: [6,29,52,75,98], trait: "領受並傳達神當下心意，造就與勸勉人。", suggest: "敬拜、先知性禱告服事。" },
+            { name: "分辨諸靈", qs: [7,30,53,76,99], trait: "敏銳察覺屬靈光景與背後動機。", suggest: "教牧輔導、屬靈爭戰、代禱。" },
+            { name: "方言", qs: [8,31,54,77,100], trait: "透過靈語與神建立深厚連結。", suggest: "個人深處禱告、敬拜讚美。" },
+            { name: "翻方言", qs: [9,32,55,78,101], trait: "明白方言意義並傳播給會眾。", suggest: "與方言恩賜者搭配服事。" },
+            { name: "使徒", qs: [10,33,56,79,102], trait: "具備開創精神，有建立新事工呼召。", suggest: "植堂、宣教、跨文化事工。" },
+            { name: "教師", qs: [11,34,57,80,103], trait: "能有系統且清晰地解明真理。", suggest: "主日學、裝備課程、門徒訓練。" },
+            { name: "幫助人的", qs: [12,35,58,81,104], trait: "樂意在細節與幕後提供支援。", suggest: "總務、庶務、器材管理。" },
+            { name: "管理行政", qs: [13,36,59,82,105], trait: "善於組織資源與人力，使團隊高效運作。", suggest: "教會行政、專案管理。" },
+            { name: "權威", qs: [14,37,60,83,106], trait: "能用話語鼓勵、激勵人採取行動。", suggest: "輔導、探訪、小組關懷。" },
+            { name: "救濟", qs: [15,38,61,84,107], trait: "樂意且慷慨地分享財務或資源。", suggest: "慈惠事工、財務奉獻支持弱勢。" },
+            { name: "領導力", qs: [16,39,62,85,108], trait: "能看見異象，並帶領團隊朝目標前進。", suggest: "擔任核心同工、事工負責人。" },
+            { name: "憐憫", qs: [17,40,63,86,109], trait: "對受苦者有極深同理心，給予溫暖陪伴。", suggest: "醫院探訪、社福關懷。" },
+            { name: "傳道", qs: [18,41,64,87,110], trait: "對失喪靈魂充滿熱忱，善於領人歸主。", suggest: "佈道隊、福音茶會、個人佈道。" },
+            { name: "牧師", qs: [19,42,65,88,111], trait: "長期關懷並陪伴信徒生命成長。", suggest: "區長、小組長、一對一帶領。" },
+            { name: "接待", qs: [20,43,66,89,112], trait: "讓人感到賓至如歸，樂於開放家庭。", suggest: "新朋友接待、愛宴、開放家庭。" },
+            { name: "才幹", qs: [21,44,67,90,113], trait: "能用巧手或專業技能製作各樣物品。", suggest: "場地佈置、修繕、文宣設計。" },
+            { name: "禱告", qs: [22,45,68,91,114], trait: "經常為他人及事工有負擔地迫切禱告。", suggest: "代禱網、守望禱告會。" },
+            { name: "藝術", qs: [23,46,69,92,115], trait: "透過音樂、舞蹈、美術等形式敬拜神。", suggest: "敬拜團、戲劇團隊、多媒體事工。" }
+        ];
+
+        // 頁面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('questions-container');
+            
+            // 動態產生 115 題
+            questionsList.forEach((question, index) => {
+                const qNum = index + 1;
+                const div = document.createElement('div');
+                div.className = 'p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all bg-gray-50/50';
+                div.innerHTML = `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <h4 class="text-lg font-medium text-gray-800">
+                                <span class="text-blue-500 font-bold mr-2">${qNum}.</span>${question}
+                            </h4>
+                        </div>
+                        <div class="flex gap-2 radio-btn-group w-full md:w-auto shrink-0">
+                            ${[4, 2, 1, 0].map(val => `
+                                <label class="cursor-pointer flex-1 md:flex-none">
+                                    <input type="radio" name="q${qNum}" value="${val}" class="peer sr-only" required>
+                                    <div class="px-3 py-2 text-center border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                                        ${val}
+                                    </div>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        });
+
+        // 彈出視窗控制
+        const modal = document.getElementById('custom-modal');
+        const btnCloseModal = document.getElementById('btn-close-modal');
+
+        function showModal(msg) {
+            document.getElementById('modal-message').innerText = msg;
+            modal.classList.remove('hidden');
+            // 延遲以達成淡入動畫
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.children[0].classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0');
+            modal.children[0].classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        btnCloseModal.addEventListener('click', closeModal);
+
+        // 表單提交與計算邏輯
+        document.getElementById('assessment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 驗證是否填妥
+            const formData = new FormData(this);
+            let unAnswered = [];
+            for (let i = 1; i <= 115; i++) {
+                if (!formData.has('q' + i)) {
+                    unAnswered.push(i);
+                }
+            }
+
+            if (unAnswered.length > 0) {
+                // 滾動到第一個未填寫的題目
+                const firstMissed = document.querySelector(`input[name="q${unAnswered[0]}"]`).closest('div.p-4');
+                firstMissed.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstMissed.classList.add('border-red-400', 'bg-red-50');
+                setTimeout(() => firstMissed.classList.remove('border-red-400', 'bg-red-50'), 2000);
+                
+                showModal(`您還有 ${unAnswered.length} 題尚未作答（例如第 ${unAnswered[0]} 題），請全部填寫完畢。`);
+                return;
+            }
+
+            // 計算分數
+            let results = categories.map(cat => {
+                let score = 0;
+                cat.qs.forEach(qId => {
+                    score += parseInt(formData.get('q' + qId) || 0);
+                });
+                return { ...cat, score };
+            });
+
+            // 排序 (分數由高到低)
+            results.sort((a, b) => b.score - a.score);
+
+            renderResults(results);
+        });
+
+        // 渲染結果畫面
+        function renderResults(results) {
+            const formSection = document.getElementById('form-section');
+            const resultsSection = document.getElementById('results-section');
+            const top3Container = document.getElementById('top-3-container');
+            const allScoresContainer = document.getElementById('all-scores-container');
+
+            // 渲染 Top 3
+            top3Container.innerHTML = '';
+            const colors = ['bg-yellow-50 border-yellow-200 text-yellow-800', 'bg-gray-50 border-gray-200 text-gray-800', 'bg-orange-50 border-orange-200 text-orange-800'];
+            const medals = ['🥇 第一名', '🥈 第二名', '🥉 第三名'];
+
+            for (let i = 0; i < 3; i++) {
+                if(results[i]) {
+                    const item = results[i];
+                    top3Container.innerHTML += `
+                        <div class="rounded-2xl border-2 ${colors[i]} p-6 shadow-sm relative overflow-hidden transform hover:-translate-y-1 transition duration-300">
+                            <div class="text-sm font-bold mb-2 opacity-80">${medals[i]}</div>
+                            <div class="flex justify-between items-end mb-4 border-b border-current pb-3">
+                                <h4 class="text-3xl font-extrabold tracking-tight">${item.name}</h4>
+                                <div class="text-2xl font-black">${item.score} <span class="text-sm font-normal">分</span></div>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div><strong class="block mb-1 opacity-90">✨ 特質：</strong> ${item.trait}</div>
+                                <div><strong class="block mb-1 opacity-90">💡 建議服事：</strong> ${item.suggest}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // 渲染全部分數長條圖
+            allScoresContainer.innerHTML = '';
+            const maxScore = 20; // 5題 * 4分 = 20分
+            
+            results.forEach((item, index) => {
+                const widthPercent = (item.score / maxScore) * 100;
+                // 用不同深淺的藍色凸顯前段班
+                const barColor = index < 3 ? 'bg-blue-500' : 'bg-blue-300';
+                
+                allScoresContainer.innerHTML += `
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-24 text-right font-medium text-gray-700 truncate">${item.name}</div>
+                        <div class="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden relative">
+                            <div class="${barColor} h-full rounded-full bar-fill flex items-center justify-end px-2" style="width: 0%;" data-width="${widthPercent}%">
+                                ${widthPercent > 10 ? `<span class="text-xs text-white font-bold">${item.score}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="w-8 text-sm font-bold text-gray-500">${item.score}</div>
+                    </div>
+                `;
+            });
+
+            // 切換視圖
+            formSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 觸發長條圖動畫
+            setTimeout(() => {
+                document.querySelectorAll('.bar-fill').forEach(bar => {
+                    bar.style.width = bar.getAttribute('data-width');
+                });
+            }, 100);
+        }
+
+        // 重新測驗
+        document.getElementById('btn-retake').addEventListener('click', () => {
+            document.getElementById('assessment-form').reset();
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('form-section').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
